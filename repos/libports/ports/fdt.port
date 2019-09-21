@@ -1,0 +1,13 @@
+LICENSE   := GPLv2+
+VERSION   := 1.5.1
+DOWNLOADS := fdt.git
+
+URL(fdt) := https://git.kernel.org/pub/scm/utils/dtc/dtc.git
+REV(fdt) := 60e0db3d65a1218b0d5a29474e769f28a18e3ca6
+DIR(fdt) := src/lib/fdt
+
+DIRS := include/fdt
+DIR_CONTENT(include/fdt) := $(addprefix src/lib/fdt/libfdt/, \
+                                        libfdt.h fdt.h libfdt_env.h)
+
+PATCHES := src/lib/fdt/libfdt.patch

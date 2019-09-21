@@ -1,0 +1,46 @@
+--- src/lib/fdt/libfdt/libfdt.h
++++ src/lib/fdt/libfdt/libfdt.h
+@@ -136,7 +136,7 @@ static inline uint32_t fdt32_ld(const fdt32_t *p)
+ 
+ static inline void fdt32_st(void *property, uint32_t value)
+ {
+-	uint8_t *bp = property;
++	uint8_t *bp = (uint8_t*)property;
+ 
+ 	bp[0] = value >> 24;
+ 	bp[1] = (value >> 16) & 0xff;
+@@ -160,7 +160,7 @@ static inline uint64_t fdt64_ld(const fdt64_t *p)
+ 
+ static inline void fdt64_st(void *property, uint64_t value)
+ {
+-	uint8_t *bp = property;
++	uint8_t *bp = (uint8_t*)property;
+ 
+ 	bp[0] = value >> 56;
+ 	bp[1] = (value >> 48) & 0xff;
+
+--- src/lib/fdt/libfdt/libfdt_env.h
++++ src/lib/fdt/libfdt/libfdt_env.h
+@@ -10,9 +10,6 @@
+ #include <stdbool.h>
+ #include <stddef.h>
+ #include <stdint.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <limits.h>
+ 
+ #ifdef __CHECKER__
+ #define FDT_FORCE __attribute__((force))
+
+--- src/lib/fdt/libfdt/libfdt_internal.h
++++ src/lib/fdt/libfdt/libfdt_internal.h
+@@ -6,6 +6,9 @@
+  * Copyright (C) 2006 David Gibson, IBM Corporation.
+  */
+ #include <fdt.h>
++#include <stdlib.h>
++#include <string.h>
++#include <limits.h>
+ 
+ #define FDT_ALIGN(x, a)		(((x) + (a) - 1) & ~((a) - 1))
+ #define FDT_TAGALIGN(x)		(FDT_ALIGN((x), FDT_TAGSIZE))
