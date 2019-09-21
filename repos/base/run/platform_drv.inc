@@ -7,6 +7,8 @@ proc have_platform_drv {} {
 	          || [have_spec imx53] \
 	          || [have_spec rpi] \
 	          || [have_spec odroid_x2] \
+	          || [have_spec arm_virt] \
+	          || [have_spec arm_64_virt] \
 	          || [have_spec x86]]
 }
 
@@ -96,11 +98,14 @@ proc append_platform_drv_build_components {} {
 }
 
 proc platform_drv_binary {} {
-	if {[have_spec arndale]  } { return arndale_platform_drv   }
-	if {[have_spec imx53]    } { return imx53_platform_drv     }
-	if {[have_spec odroid_x2]} { return odroid_x2_platform_drv }
-	if {[have_spec rpi]      } { return rpi_platform_drv       }
-	if {[have_spec x86]      } { return platform_drv           }
+	if {[have_spec arndale]      } { return arndale_platform_drv      }
+	if {[have_spec imx53]        } { return imx53_platform_drv        }
+	if {[have_spec odroid_x2]    } { return odroid_x2_platform_drv    }
+	if {[have_spec rpi]          } { return rpi_platform_drv          }
+	if {[have_spec x86]          } { return platform_drv              }
+	if {[have_spec arm_virt]     } { return virt_platform_drv         }
+	if {[have_spec arm_64_virt]  } { return virt_platform_drv         }
+
 	return no_platform_drv_available
 }
 
@@ -263,6 +268,9 @@ proc platform_drv_config {} {
 
 		append_if [have_spec arm] drv_config {
 			<service name="Regulator"/>}
+
+		append_if [have_spec fdt] drv_config {
+			<service name="ROM"/>}
 
 		append drv_config {
 		</provides>
