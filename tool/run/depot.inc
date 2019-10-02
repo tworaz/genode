@@ -474,7 +474,7 @@ proc drivers_interactive_pkg { } {
 
 proc drivers_nic_pkg { } {
 
-	if {[have_spec x86] && ![have_spec muen] &&
+	if {[have_spec x86] && ![have_spec muen] && ![have_spec virtio] &&
 	    ![have_spec linux]}          { return drivers_nic-pc              }
 	if {[have_spec muen]}            { return drivers_nic-muen            }
 	if {[have_spec linux]}           { return drivers_nic-linux           }
@@ -485,6 +485,11 @@ proc drivers_nic_pkg { } {
 	if {[have_spec imx6q_sabrelite]} { return drivers_nic-imx6q_sabrelite }
 	if {[have_spec imx7d_sabre]}     { return drivers_nic-imx7d_sabre     }
 	if {[have_spec imx8q_evk]}       { return drivers_nic-imx8q_evk       }
+
+	if {[have_spec virtio]} {
+		if {[have_spec pci]} { return drivers_nic-virtio-pci }
+		return drivers_nic-virtio-mmio
+	}
 
 
 	puts stderr "drivers_nic package undefined for this build configuration"
