@@ -14,6 +14,37 @@ proc qemu_args { } {
 	return $qemu_args
 }
 
+proc qemu_nic_model {} {
+	if [have_spec lan9118]     { return lan9118 }
+	if [have_spec zynq]        { return cadence_gem }
+	if [have_spec x86]         { return e1000 }
+	return nic_model_missing
+}
+
+proc is_virtio_mmio_platform {} {
+	return [expr [have_spec arm_virt] \
+	          || [have_spec arm_64_virt]]
+}
+
+proc append_qemu_nic_args { { extra_netdev_args "" } } {
+	global qemu_args
+	append qemu_args " -netdev user,id=net0"
+
+	if { $extra_netdev_args ne "" } {
+		append qemu_args ",$extra_netdev_args"
+	}
+
+	if {[have_spec virtio]} {
+		if {[is_virtio_mmio_platform]} {
+			append qemu_args " -device virtio-net-device,netdev=net0"
+		} else {
+			append qemu_args " -device virtio-net-pci,netdev=net0"
+		}
+	} else {
+		append qemu_args " -net nic,model=[qemu_nic_model],netdev=net0 "
+	}
+}
+
 
 ##
 # Check whether Qemu support is available

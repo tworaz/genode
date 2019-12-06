@@ -2,8 +2,6 @@
 # \brief  Test for the SSH terminal
 #
 
-assert_spec x86
-
 if {[have_spec linux]} {
 	puts "Run script is not supported on this platform."
 	exit 0
@@ -12,28 +10,22 @@ if {[have_spec linux]} {
 # Build
 #
 
-
-source ${genode_dir}/repos/base/run/platform_drv.inc
-append_platform_drv_build_components
-
-build $build_components
-
 create_boot_directory
 
 import_from_depot [depot_user]/src/[base_src]
+import_from_depot [depot_user]/pkg/[drivers_nic_pkg]
 import_from_depot [depot_user]/src/bash
 import_from_depot [depot_user]/src/coreutils-minimal
 import_from_depot [depot_user]/src/exec_terminal
 import_from_depot [depot_user]/src/init
-import_from_depot [depot_user]/src/ipxe_nic_drv
 import_from_depot [depot_user]/src/libc
 import_from_depot [depot_user]/src/libcrypto
 import_from_depot [depot_user]/src/libssh
 import_from_depot [depot_user]/src/noux
-import_from_depot [depot_user]/src/platform_drv
+import_from_depot [depot_user]/src/ncurses
+import_from_depot [depot_user]/src/report_rom
 import_from_depot [depot_user]/src/posix
 import_from_depot [depot_user]/src/ram_fs
-import_from_depot [depot_user]/src/rtc_drv
 import_from_depot [depot_user]/src/ssh_terminal
 import_from_depot [depot_user]/src/vfs
 import_from_depot [depot_user]/src/vfs_jitterentropy
@@ -69,21 +61,15 @@ set config {
 		</route>
 	</start>
 
-	<start name="nic_drv">
-		<binary name="ipxe_nic_drv"/>
-		<resource name="RAM" quantum="4M"/>
+	<start name="drivers" caps="1000">
+		<resource name="RAM" quantum="32M" constrain_phys="yes"/>
+		<binary name="init"/>
+		<route>
+			<service name="ROM" label="config"> <parent label="drivers.config"/> </service>
+			<service name="Timer"> <child name="timer"/> </service>
+			<any-service> <parent/> </any-service>
+		</route>
 		<provides> <service name="Nic"/> </provides>
-		<route>
-			<any-service> <parent/> <any-child/> </any-service>
-		</route>
-	</start>
-
-	<start name="rtc_drv">
-		<resource name="RAM" quantum="1M"/>
-		<provides> <service name="Rtc"/> </provides>
-		<route>
-			<any-service> <parent/> <any-child/> </any-service>
-		</route>
 	</start>
 
 	<start name="ram_fs">
@@ -124,7 +110,7 @@ set config {
 			</vfs>
 		</config>
 		<route>
-			<service name="Nic"> <child name="nic_drv"/> </service>
+			<service name="Nic"> <child name="drivers"/> </service>
 			<service name="Report"> <child name="report_rom"/> </service>
 			<service name="Timer"> <child name="timer"/> </service>
 			<service name="CPU"> <parent/> </service>
@@ -217,8 +203,6 @@ set config {
 	</start>
 }
 
-append_platform_drv_config
-
 append config {
 </config>}
 
@@ -240,9 +224,6 @@ set boot_modules {
 	ed25519_key
 }
 
-# platform-specific modules
-append_platform_drv_boot_modules
-
 build_boot_image $boot_modules
 
 #
@@ -250,15 +231,7 @@ build_boot_image $boot_modules
 #
 
 append qemu_args " -m 512 -nographic "
-
-proc qemu_nic_model {} {
-	if [have_spec x86]     { return e1000 }
-	if [have_spec lan9118] { return lan9118 }
-	return nic_model_missing
-}
-
-append qemu_args " -netdev user,id=net0,hostfwd=tcp::5555-:22 "
-append qemu_args " -net nic,model=[qemu_nic_model],netdev=net0 "
+append_qemu_nic_args "hostfwd=tcp::5555-:22"
 
 set lxip_match_string "ipaddr=(\[0-9\]+\.\[0-9\]+\.\[0-9\]+\.\[0-9\]+).*\n"
 
