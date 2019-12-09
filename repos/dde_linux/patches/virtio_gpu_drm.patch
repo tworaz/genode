@@ -1,0 +1,62 @@
+diff --git a/drivers/gpu/drm/drm_connector.c b/drivers/gpu/drm/drm_connector.c
+index 2166000ed057..f274b12a9616 100644
+--- a/drivers/gpu/drm/drm_connector.c
++++ b/drivers/gpu/drm/drm_connector.c
+@@ -631,7 +631,9 @@ void drm_connector_list_iter_begin(struct drm_device *dev,
+ {
+ 	iter->dev = dev;
+ 	iter->conn = NULL;
++#ifdef CONFIG_LOCKDEP
+ 	lock_acquire_shared_recursive(&connector_list_iter_dep_map, 0, 1, NULL, _RET_IP_);
++#endif
+ }
+ EXPORT_SYMBOL(drm_connector_list_iter_begin);
+ 
+@@ -712,7 +714,9 @@ void drm_connector_list_iter_end(struct drm_connector_list_iter *iter)
+ 		__drm_connector_put_safe(iter->conn);
+ 		spin_unlock_irqrestore(&config->connector_list_lock, flags);
+ 	}
++#ifdef CONFIG_LOCKDEP
+	lock_release(&connector_list_iter_dep_map, _RET_IP_);
++#endif
+ }
+ EXPORT_SYMBOL(drm_connector_list_iter_end);
+ 
+diff --git a/drivers/gpu/drm/drm_edid.c b/drivers/gpu/drm/drm_edid.c
+index 474ac04d5600..6ee80c0a80c7 100644
+--- a/drivers/gpu/drm/drm_edid.c
++++ b/drivers/gpu/drm/drm_edid.c
+@@ -28,6 +28,7 @@
+  * DEALINGS IN THE SOFTWARE.
+  */
+ 
++#include <linux/bitmap.h>
+ #include <linux/hdmi.h>
+ #include <linux/i2c.h>
+ #include <linux/kernel.h>
+diff --git a/include/drm/drm_atomic_uapi.h b/include/drm/drm_atomic_uapi.h
+index 8cec52ad1277..915675799f06 100644
+--- a/include/drm/drm_atomic_uapi.h
++++ b/include/drm/drm_atomic_uapi.h
+@@ -29,6 +29,8 @@
+ #ifndef DRM_ATOMIC_UAPI_H_
+ #define DRM_ATOMIC_UAPI_H_
+ 
++#include <linux/compiler.h>
++
+ struct drm_crtc_state;
+ struct drm_display_mode;
+ struct drm_property_blob;
+diff --git a/include/drm/drm_edid.h b/include/drm/drm_edid.h
+index f0b03d401c27..840477505e21 100644
+--- a/include/drm/drm_edid.h
++++ b/include/drm/drm_edid.h
+@@ -350,7 +350,7 @@ int __drm_get_edid_firmware_path(char *buf, size_t bufsize);
+ static inline struct edid *
+ drm_load_edid_firmware(struct drm_connector *connector)
+ {
+-	return ERR_PTR(-ENOENT);
++	return (struct edid *)ERR_PTR(-ENOENT);
+ }
+ #endif
+ 

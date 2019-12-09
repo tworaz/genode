@@ -85,19 +85,11 @@ void lx_backtrace(void);
 		} \
 	} while (0)
 
-typedef int clockid_t;
-
 #define PAGE_SIZE 4096UL
 
 enum { PAGE_SHIFT = 12 };
 enum { HZ = 100UL, };
 
-typedef __u16 __le16;
-typedef __u32 __le32;
-typedef __u64 __le64;
-typedef __u16 __be16;
-typedef __u32 __be32;
-typedef __u64 __be64;
 typedef __s64 time64_t;
 
 #define L1_CACHE_BYTES  32
@@ -1181,12 +1173,6 @@ void trace_mdio_access(void *dummy, ...);
 #define __UAPI_DEF_IF_IFNAMSIZ 1
 #define __UAPI_DEF_IF_IFREQ 1
 #define __UAPI_DEF_IF_NET_DEVICE_FLAGS 1
-
-/************************
- ** uapi/linux/types.h **
- ************************/
- 
-typedef unsigned __poll_t;
 
 /************************/
 

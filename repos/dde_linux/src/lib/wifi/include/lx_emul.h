@@ -89,8 +89,6 @@ static inline int atomic_long_cmpxchg(atomic_long_t *v, long old, long n)
 
 #include <lx_emul/types.h>
 
-typedef int clockid_t;
-
 typedef size_t __kernel_size_t;
 typedef long   __kernel_time_t;
 typedef long   __kernel_suseconds_t;
@@ -99,8 +97,6 @@ typedef long   __kernel_suseconds_t;
 
 #define DECLARE_BITMAP(name,bits) \
 	unsigned long name[BITS_TO_LONGS(bits)]
-
-typedef unsigned __poll_t;
 
 
 /******************
@@ -136,13 +132,6 @@ static inline unsigned int cpumask_next(int n, const struct cpumask *srcp)
  ************************/
 
 #define __bitwise__
-
-typedef __u16 __le16;
-typedef __u32 __le32;
-typedef __u64 __le64;
-typedef __u16 __be16;
-typedef __u32 __be32;
-typedef __u64 __be64;
 
 typedef __u16 __sum16;
 typedef __u32 __wsum;
@@ -771,12 +760,7 @@ static inline int test_bit(int nr, const volatile unsigned long *addr);
  ** asm-generic/bitops/find.h **
  *******************************/
 
-unsigned long find_next_bit(const unsigned long *addr, unsigned long size, unsigned long offset);
-unsigned long find_next_zero_bit(const unsigned long *addr, unsigned long size, unsigned long offset);
 unsigned long find_last_bit(const unsigned long *addr, unsigned long size);
-
-#define find_first_bit(addr, size) find_next_bit((addr), (size), 0)
-#define find_first_zero_bit(addr, size) find_next_zero_bit((addr), (size), 0)
 
 
 /****************

@@ -1,0 +1,29 @@
+diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
+index bb4cc4910750..404deee32803 100644
+--- a/include/linux/virtio_config.h
++++ b/include/linux/virtio_config.h
+@@ -184,7 +184,7 @@ struct virtqueue *virtio_find_single_vq(struct virtio_device *vdev,
+ 	int err = vdev->config->find_vqs(vdev, 1, &vq, callbacks, names, NULL,
+ 					 NULL);
+ 	if (err < 0)
+-		return ERR_PTR(err);
++		return (struct virtqueue *)ERR_PTR(err);
+ 	return vq;
+ }
+ 
+diff --git a/include/uapi/linux/virtio_ring.h b/include/uapi/linux/virtio_ring.h
+index 559f42e73315..f0bb13646df1 100644
+--- a/include/uapi/linux/virtio_ring.h
++++ b/include/uapi/linux/virtio_ring.h
+@@ -168,9 +168,9 @@ static inline void vring_init(struct vring *vr, unsigned int num, void *p,
+ 			      unsigned long align)
+ {
+ 	vr->num = num;
+-	vr->desc = p;
++	vr->desc = (struct vring_desc *)p;
+ 	vr->avail = (struct vring_avail *)((char *)p + num * sizeof(struct vring_desc));
+-	vr->used = (void *)(((uintptr_t)&vr->avail->ring[num] + sizeof(__virtio16)
++	vr->used = (struct vring_used *)(((uintptr_t)&vr->avail->ring[num] + sizeof(__virtio16)
+ 		+ align-1) & ~(align - 1));
+ }
+ 

@@ -33,6 +33,8 @@
 #include <lx_kit/malloc.h>
 #include <lx_kit/scheduler.h>
 
+#include <lx_emul/impl/bitops.h>
+
 
 typedef ::size_t       size_t;
 typedef Genode::addr_t addr_t;
@@ -1033,44 +1035,6 @@ void put_page(struct page *page)
 
 	Lx::Malloc::dma().free(page->addr);
 	kfree(page);
-}
-
-
-/*******************************
- ** asm-generic/bitops/find.h **
- *******************************/
-
-unsigned long find_next_bit(const unsigned long *addr, unsigned long size,
-                            unsigned long offset)
-{
-	unsigned long i  = offset / BITS_PER_LONG;
-	offset -= (i * BITS_PER_LONG);
-
-	for (; offset < size; offset++)
-		if (addr[i] & (1UL << offset))
-			return offset;
-
-	return size;
-}
-
-
-unsigned long find_next_zero_bit(unsigned long const *addr, unsigned long size,
-                                 unsigned long offset)
-{
-	unsigned long i, j;
-
-	for (i = offset; i < (size / BITS_PER_LONG); i++)
-		if (addr[i] != ~0UL)
-			break;
-
-	if (i == size)
-		return size;
-
-	for (j = 0; j < BITS_PER_LONG; j++)
-		if ((~addr[i]) & (1UL << j))
-			break;
-
-	return (i * BITS_PER_LONG) + j;
 }
 
 

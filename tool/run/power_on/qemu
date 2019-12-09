@@ -130,10 +130,12 @@ proc run_power_on { } {
 			append qemu_args " -global virtio-pci.disable-legacy=on"
 			append qemu_args " -device virtio-mouse-pci"
 			append qemu_args " -device virtio-keyboard-pci"
+			append qemu_args " -vga none -device virtio-gpu-pci"
 		} else {
 			append qemu_args " -global virtio-mmio.force-legacy=false"
 			append qemu_args " -device virtio-mouse-device"
 			append qemu_args " -device virtio-keyboard-device"
+			append qemu_args " -device virtio-gpu-device"
 		}
 	}
 

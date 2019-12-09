@@ -44,8 +44,6 @@ enum { HZ = 100UL };          /* dependency of lx_emul/jiffies.h */
  ** linux/timer.h **
  *******************/
 
-typedef int clockid_t;        /* dependency of lx_emul/timer.h */
-
 #define from_timer(var, callback_timer, timer_fieldname) \
 	container_of(callback_timer, typeof(*var), timer_fieldname)
 
@@ -162,16 +160,6 @@ sc_err_t sc_misc_set_control(sc_ipc_t ipc, sc_rsrc_t resource,
                              sc_ctrl_t ctrl, uint32_t val);
 
 
-/************************
- ** uapi/linux/types.h **
- ************************/
-
-typedef __u16 __le16;
-typedef __u32 __le32;
-typedef __u64 __le64;
-typedef __u64 __be64;
-
-
 /********************
  ** linux/printk.h **
  ********************/
@@ -215,6 +203,7 @@ struct sync_file *sync_file_create(struct dma_fence *);
  * For now, hardcoded
  */
 #define PAGE_SIZE 4096UL
+#define PAGE_MASK (~(PAGE_SIZE-1))
 
 enum {
 	PAGE_SHIFT = 12,
@@ -225,17 +214,8 @@ struct page
 	atomic_t   _count;
 	void      *addr;
 	dma_addr_t paddr;
+	unsigned   flags;
 } __attribute((packed));
-
-extern unsigned long find_next_bit(const unsigned long *addr, unsigned long
-                                   size, unsigned long offset);
-
-extern unsigned long find_next_zero_bit(const unsigned long *addr, unsigned
-                                        long size, unsigned long offset);
-
-#define find_first_bit(addr, size) find_next_bit((addr), (size), 0)
-
-#define find_first_zero_bit(addr, size) find_next_zero_bit((addr), (size), 0)
 
 #define __const_hweight8(w)             \
 	( (!!((w) & (1ULL << 0))) +       \
@@ -253,9 +233,6 @@ extern unsigned long find_next_zero_bit(const unsigned long *addr, unsigned
 
 #define GENMASK(h, l) \
 	(((~0UL) << (l)) & (~0UL >> (BITS_PER_LONG - 1 - (h))))
-
-/* needed by 'virt_to_phys', which is needed by agp/generic.c */
-typedef unsigned long phys_addr_t;
 
 void *memchr_inv(const void *s, int c, size_t n);
 
@@ -421,11 +398,6 @@ struct ww_mutex {
 
 #define DEFINE_WW_CLASS(classname) \
 	struct ww_class classname;
-
-#ifndef CONFIG_DEBUG_OBJECTS_WORK
-#define INIT_WORK_ONSTACK(_work, _func) while(0) { }
-static inline void destroy_work_on_stack(struct work_struct *work) { }
-#endif
 
 
 /*******************

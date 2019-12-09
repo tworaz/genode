@@ -14,9 +14,12 @@
 /* Linux kit includes */
 #include <lx_kit/malloc.h>
 
+#define ZERO_SIZE_PTR ((void *)16)
 
 void *kmalloc(size_t size, gfp_t flags)
 {
+	if (size == 0) return ZERO_SIZE_PTR;
+
 	if (flags & __GFP_DMA)
 		Genode::warning("GFP_DMA memory (below 16 MiB) requested "
 		                "(", __builtin_return_address(0), ")");
@@ -25,10 +28,15 @@ void *kmalloc(size_t size, gfp_t flags)
 		                "(", __builtin_return_address(0), ")");
 
 	void *addr = nullptr;
-
-	addr = (flags & GFP_LX_DMA)
-		? Lx::Malloc::dma().alloc(size)
-		: Lx::Malloc::mem().alloc(size);
+	if (flags & GFP_LX_DMA) {
+		addr = Lx::Malloc::dma().alloc(size);
+	} else {
+		if (Genode::log2(size) < Lx::Malloc::MAX_SIZE_LOG2) {
+			addr = Lx::Malloc::mem().alloc(size);
+		} else {
+			addr = Lx::Malloc::mem().alloc_large(size);
+		}
+	}
 
 	if ((Genode::addr_t)addr & 0x3)
 		Genode::error("unaligned kmalloc ", (Genode::addr_t)addr);
@@ -69,28 +77,38 @@ void *kcalloc(size_t n, size_t size, gfp_t flags)
 
 void kfree(void const *p)
 {
-	if (!p) return;
+	if (!p || p == ZERO_SIZE_PTR) return;
 
-	if (Lx::Malloc::mem().inside((Genode::addr_t)p))
-		Lx::Malloc::mem().free(p);
-	else if (Lx::Malloc::dma().inside((Genode::addr_t)p))
+	if (Lx::Malloc::mem().inside((Genode::addr_t)p)) {
+		if (Lx::Malloc::mem().size(p)) {
+			Lx::Malloc::mem().free(p);
+		} else {
+			Lx::Malloc::mem().free_large(p);
+		}
+	} else if (Lx::Malloc::dma().inside((Genode::addr_t)p)) {
 		Lx::Malloc::dma().free(p);
-	else
+	} else {
 		Genode::error(__func__, ": unknown block at ", p, ", "
 		              "called from ", __builtin_return_address(0));
+	}
 }
 
 
 static size_t _ksize(void *p)
 {
+	if (p == ZERO_SIZE_PTR) return 0;
+
 	size_t size = 0;
 
-	if (Lx::Malloc::mem().inside((Genode::addr_t)p))
+	if (Lx::Malloc::mem().inside((Genode::addr_t)p)) {
 		size = Lx::Malloc::mem().size(p);
-	else if (Lx::Malloc::dma().inside((Genode::addr_t)p))
+		// TODO: This can fail if somebody requests the size of block allocated with alloc_large.
+		BUG_ON(size == 0);
+	} else if (Lx::Malloc::dma().inside((Genode::addr_t)p)) {
 		size = Lx::Malloc::dma().size(p);
-	else
+	} else {
 		Genode::error(__func__, ": unknown block at ", p);
+	}
 
 	return size;
 }
@@ -104,7 +122,7 @@ size_t ksize(void *p)
 
 void kzfree(void const *p)
 {
-	if (!p) return;
+	if (!p || p == ZERO_SIZE_PTR) return;
 
 	size_t len = ksize(const_cast<void*>(p));
 

@@ -58,5 +58,10 @@ void mutex_unlock(struct mutex *m);
 int mutex_trylock(struct mutex *m);
 int mutex_is_locked(struct mutex *m);
 
+static inline int mutex_lock_interruptible(struct mutex *lock) {
+	mutex_lock(lock);
+	return 0;
+}
+
 /* special case in net/wireless/util.c:1357 */
 #define mutex_lock_nested(lock, subclass) mutex_lock(lock)

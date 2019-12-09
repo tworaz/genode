@@ -33,17 +33,9 @@ enum { HZ = 100UL };
 #include <lx_emul/jiffies.h>
 #include <lx_emul/time.h>
 #include <lx_emul/bitops.h>
-
-typedef int clockid_t;
-
 #include <lx_emul/timer.h>
 #include <lx_emul/spinlock.h>
 #include <lx_emul/mutex.h>
-
-typedef __u16 __le16;
-typedef __u32 __le32;
-typedef __u64 __le64;
-typedef __u64 __be64;
 
 #define __aligned_u64 __u64 __attribute__((aligned(8)))
 
@@ -448,7 +440,6 @@ __wsum csum_partial(const void *buff, int len, __wsum sum);
 bool csum_and_copy_from_iter_full(void *addr, size_t bytes, __wsum *csum, struct iov_iter *i);
 bool copy_from_iter_full(void *addr, size_t bytes, struct iov_iter *i);
 __wsum csum_block_sub(__wsum, __wsum, int);
-typedef unsigned __poll_t;
 
 typedef struct poll_table_struct { } poll_table;
 size_t copy_to_iter(void *addr, size_t bytes, struct iov_iter *i);

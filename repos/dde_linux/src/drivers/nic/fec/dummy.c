@@ -149,11 +149,6 @@ void *kmap_atomic(struct page *page)
 	return NULL;
 }
 
-const char *kobject_name(const struct kobject *kobj)
-{
-	TRACE_AND_STOP;
-}
-
 void kunmap_atomic(void *addr)
 {
 	TRACE_AND_STOP;

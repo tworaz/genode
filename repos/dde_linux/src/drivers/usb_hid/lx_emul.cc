@@ -22,6 +22,7 @@
 #include <lx_emul/impl/completion.h>
 #include <lx_emul/impl/wait.h>
 #include <lx_emul/impl/usb.h>
+#include <lx_emul/impl/bitops.h>
 
 #include <lx_kit/backend_alloc.h>
 
@@ -130,12 +131,6 @@ Genode::Ram_dataspace_capability Lx::backend_alloc(Genode::addr_t size, Genode::
 const char *dev_name(const struct device *dev) { return dev->name; }
 
 size_t strlen(const char *s) { return Genode::strlen(s); }
-
-int  mutex_lock_interruptible(struct mutex *m)
-{
-	mutex_lock(m);
-	return 0;
-}
 
 int driver_register(struct device_driver *drv)
 {
@@ -325,36 +320,6 @@ u16 get_unaligned_le16(const void *p)
 {
 	const struct __una_u16 *ptr = (const struct __una_u16 *)p;
 	return ptr->x;
-}
-
-
-unsigned long find_next_bit(const unsigned long *addr, unsigned long size, unsigned long offset)
-{
-	unsigned long i  = offset / BITS_PER_LONG;
-	offset -= (i * BITS_PER_LONG);
-
-	for (; offset < size; offset++)
-		if (addr[i] & (1UL << offset))
-			return offset + (i * BITS_PER_LONG);
-
-	return size;
-}
-
-
-long find_next_zero_bit_le(const void *addr,
-                           unsigned long size, unsigned long offset)
-{
-	unsigned long max_size = sizeof(long) * 8;
-	if (offset >= max_size) {
-		Genode::warning("Offset greater max size");
-		return offset + size;
-	}
-
-	for (; offset < max_size; offset++)
-		if (!(*(unsigned long*)addr & (1L << offset)))
-			return offset;
-
-	return offset + size;
 }
 
 

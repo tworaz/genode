@@ -112,8 +112,8 @@ class Lx_kit::Slab_backend_alloc : public Lx::Slab_backend_alloc,
 			return _range.alloc(size, out_addr);
 		}
 
-		void free(void *addr) {
-			_range.free(addr); }
+		void free(void const *addr) {
+			_range.free((void *)addr); }
 
 		void   free(void *addr, size_t size) override { _range.free(addr, size); }
 		size_t overhead(size_t size) const override { return  0; }
@@ -307,7 +307,7 @@ class Lx_kit::Malloc : public Lx::Malloc
 			return addr;
 		}
 
-		void free_large(void *ptr)
+		void free_large(void const *ptr)
 		{
 			_back_allocator.free(ptr);
 		}

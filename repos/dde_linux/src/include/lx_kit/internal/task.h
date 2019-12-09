@@ -22,6 +22,7 @@
 #include <base/sleep.h>
 
 /* Linux emulation environment includes */
+#include <lx_kit/scheduler.h>
 #include <lx_kit/internal/list.h>
 #include <lx_kit/internal/arch_execute.h>
 

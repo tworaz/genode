@@ -52,12 +52,6 @@ enum { HZ = 100UL };
 
 typedef __u8  u_int8_t;
 
-typedef __u16 __le16;
-typedef __u32 __le32;
-typedef __u64 __le64;
-
-typedef __u64 __be64;
-
 typedef __u16 __sum16;
 typedef __u32 __wsum;
 
@@ -81,27 +75,6 @@ typedef __u32 __wsum;
 #include <lx_emul/bitops.h>
 
 #define ffz(x) __ffs(~(x))
-
-/*******************************
- ** asm-generic/bitops/find.h **
- *******************************/
-
-unsigned long find_first_zero_bit(unsigned long const *addr, unsigned long size);
-
-static inline unsigned long find_next_bit(const unsigned long *addr, unsigned long size,
-		unsigned long offset)
-{
-	unsigned long i  = offset / BITS_PER_LONG;
-	offset -= (i * BITS_PER_LONG);
-
-	for (; offset < size; offset++)
-		if (addr[i] & (1UL << offset))
-			return offset;
-
-	return size;
-}
-
-#define find_first_bit(addr, size) find_next_bit((addr), (size), 0)
 
 
 /****************************
@@ -1056,8 +1029,6 @@ struct hrtimer
 {
 	enum hrtimer_restart (*function)(struct hrtimer *);
 };
-
-typedef int clockid_t;
 
 void hrtimer_init(struct hrtimer *timer, clockid_t which_clock, enum hrtimer_mode mode);
 void hrtimer_start(struct hrtimer *timer, ktime_t tim, const enum hrtimer_mode mode);

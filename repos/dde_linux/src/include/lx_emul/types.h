@@ -50,6 +50,13 @@ typedef uint32_t __u32;
 typedef int64_t  __s64;
 typedef uint64_t __u64;
 
+typedef __u16 __le16;
+typedef __u16 __be16;
+typedef __u32 __le32;
+typedef __u32 __be32;
+typedef __u64 __le64;
+typedef __u64 __be64;
+
 struct list_head {
 	struct list_head *next, *prev;
 };
@@ -97,6 +104,10 @@ typedef unsigned short umode_t;
 typedef __u16          __be16;
 typedef __u32          __be32;
 typedef long           clock_t;
+typedef long           ptrdiff_t;
+typedef unsigned long  phys_addr_t;
+typedef unsigned       __poll_t;
+typedef int            clockid_t;
 
 #ifndef __cplusplus
 typedef u16            wchar_t;

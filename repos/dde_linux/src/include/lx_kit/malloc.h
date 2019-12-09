@@ -47,7 +47,7 @@ class Lx::Malloc : public Genode::Allocator
 
 		virtual void *alloc_large(size_t size) = 0;
 
-		virtual void free_large(void *ptr) = 0;
+		virtual void free_large(void const *ptr) = 0;
 
 		virtual size_t size(void const *a) = 0;
 

@@ -90,3 +90,13 @@
 
 #define unreachable() \
 	do { __builtin_unreachable(); } while (0)
+
+#define __pure __attribute__((__pure__))
+
+#define COMPILER_HAS_GENERIC_BUILTIN_OVERFLOW 1
+
+/****************************
+ ** linux/compiler_types.h **
+ ****************************/
+
+#define __must_hold(x)

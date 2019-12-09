@@ -42,9 +42,11 @@
 #define cpu_to_be32p __cpu_to_be32p
 #define cpu_to_le32s __cpu_to_le32s
 #define cpu_to_le64  __cpu_to_le64
+#define cpu_to_be64  __cpu_to_be64
 #define le16_to_cpup __le16_to_cpup
 #define be16_to_cpup __be16_to_cpup
 #define le32_to_cpup __le32_to_cpup
 #define le32_to_cpus __le32_to_cpus
 #define be32_to_cpup __be32_to_cpup
 #define le64_to_cpu  __le64_to_cpu
+#define be64_to_cpu  __be64_to_cpu

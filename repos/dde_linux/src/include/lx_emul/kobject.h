@@ -15,6 +15,9 @@
  * version 2.
  */
 
+#ifndef _LX_EMUL__KOBJECT_
+#define _LX_EMUL__KOBJECT_
+
 /******************
  ** linux/kref.h **
  ******************/
@@ -39,7 +42,7 @@ struct kobject
 	struct kset      *kset;
 	struct kobj_type *ktype;
 	struct kobject   *parent;
-	const char       *name;
+	char              name[32];
 };
 
 struct kobj_uevent_env
@@ -52,6 +55,10 @@ struct kobj_uevent_env;
 
 int add_uevent_var(struct kobj_uevent_env *env, const char *format, ...);
 void  kobject_put(struct kobject *);
-const char *kobject_name(const struct kobject *kobj);
+int kobject_set_name_vargs(struct kobject *kobj, const char *fmt, va_list vargs);
+static inline const char *kobject_name(const struct kobject *kobj) {
+	return kobj->name; }
 char *kobject_get_path(struct kobject *kobj, gfp_t gfp_mask);
 struct kobject * kobject_create_and_add(const char *, struct kobject *);
+
+#endif /* _LX_EMUL__KOBJECT_ */

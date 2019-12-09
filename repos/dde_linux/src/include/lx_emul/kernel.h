@@ -175,11 +175,15 @@ void might_sleep();
 #define INT_MAX   ((int)(~0U>>1))
 #define UINT_MAX  (~0U)
 #define INT_MIN   (-INT_MAX - 1)
+#define SIZE_MAX  (~(size_t)0)
 #define USHRT_MAX ((u16)(~0U))
 #define LONG_MAX  ((long)(~0UL>>1))
 #define SHRT_MAX  ((s16)(USHRT_MAX>>1))
 #define SHRT_MIN  ((s16)(-SHRT_MAX - 1))
 #define ULONG_MAX (~0UL)
+
+#define U32_MAX   ((u32)~0U)
+#define U64_MAX   ((u64)~0ULL)
 
 #define swap(a, b) \
 	do { typeof(a) __tmp = (a); (a) = (b); (b) = __tmp; } while (0)

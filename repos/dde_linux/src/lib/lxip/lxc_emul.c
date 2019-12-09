@@ -23,6 +23,7 @@
 #include <net/tcp.h>
 #include <net/tcp_states.h>
 
+#include <lx_emul/impl/bitops.h>
 
 /***********************
  ** linux/genetlink.h **
@@ -184,29 +185,6 @@ void rtnl_notify(struct sk_buff *skb, struct net *net, u32 pid, u32 group,
 struct iphdr *ip_hdr(const struct sk_buff *skb)
 {
 	return (struct iphdr *)skb_network_header(skb);
-}
-
-
-/*******************************
- ** asm-generic/bitops/find.h **
- *******************************/
-
-unsigned long find_first_zero_bit(unsigned long const *addr, unsigned long size)
-{
-	unsigned long i, j;
-
-	for (i = 0; i < (size / BITS_PER_LONG); i++)
-		if (addr[i] != ~0UL)
-			break;
-
-	if (i == size)
-		return size;
-
-	for (j = 0; j < BITS_PER_LONG; j++)
-		if ((~addr[i]) & (1 << j))
-			break;
-
-	return (i * BITS_PER_LONG) + j;
 }
 
 

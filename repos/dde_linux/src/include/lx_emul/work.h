@@ -57,6 +57,8 @@ bool flush_work_sync(struct work_struct *work);
 
 void delayed_work_timer_fn(struct timer_list *t);
 
+static inline void destroy_work_on_stack(struct work_struct *work) { }
+
 #define PREPARE_WORK(_work, _func) \
         do { (_work)->func = (_func); } while (0)
 
@@ -71,6 +73,9 @@ void delayed_work_timer_fn(struct timer_list *t);
 
 #define INIT_WORK(_work, _func)\
         do { __INIT_WORK((_work), (_func), 0); } while (0)
+
+#define INIT_WORK_ONSTACK(_work, _func)	\
+	__INIT_WORK((_work), (_func), 1)
 
 #define INIT_DELAYED_WORK(_work, _func) \
         do { \

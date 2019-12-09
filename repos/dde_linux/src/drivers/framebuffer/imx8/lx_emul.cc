@@ -47,6 +47,7 @@
 #include <lx_emul/impl/timer.h>
 #include <lx_emul/impl/wait.h> /* dependency of lx_emul/impl/work.h */
 #include <lx_emul/impl/work.h>
+#include <lx_emul/impl/bitops.h>
 
 #include <lx_kit/irq.h>
 #include <lx_kit/malloc.h>
@@ -1750,30 +1751,6 @@ void drm_sysfs_hotplug_event(struct drm_device *dev)
 #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) & (BITS_PER_LONG - 1)))
 #define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
 
-unsigned long find_next_bit(const unsigned long *addr, unsigned long nbits,
-                            unsigned long start)
-{
-	unsigned long tmp;
-
-	if (!nbits || start >= nbits)
-		return nbits;
-
-	tmp = addr[start / BITS_PER_LONG] ^ 0UL;
-
-	/* Handle 1st word. */
-	tmp &= BITMAP_FIRST_WORD_MASK(start);
-	start = round_down(start, BITS_PER_LONG);
-
-	while (!tmp) {
-		start += BITS_PER_LONG;
-		if (start >= nbits)
-			return nbits;
-		tmp = addr[start / BITS_PER_LONG] ^ 0UL;
-	}
-
-	return min(start + __ffs(tmp), nbits);
-}
-
 void bitmap_set(unsigned long *map, unsigned int start, int len)
 {
 	unsigned long *p = map + BIT_WORD(start);
@@ -1792,25 +1769,6 @@ void bitmap_set(unsigned long *map, unsigned int start, int len)
 		mask_to_set &= BITMAP_LAST_WORD_MASK(size);
 		*p |= mask_to_set;
 	}
-}
-
-unsigned long find_next_zero_bit(unsigned long const *addr, unsigned long size,
-                                 unsigned long offset)
-{
-	unsigned long i, j;
-
-	for (i = offset; i < (size / BITS_PER_LONG); i++)
-		if (addr[i] != ~0UL)
-			break;
-
-	if (i == size)
-		return size;
-
-	for (j = 0; j < BITS_PER_LONG; j++)
-		if ((~addr[i]) & (1UL << j))
-			break;
-
-	return (i * BITS_PER_LONG) + j;
 }
 
 unsigned int irq_find_mapping(struct irq_domain *, irq_hw_number_t hwirq)

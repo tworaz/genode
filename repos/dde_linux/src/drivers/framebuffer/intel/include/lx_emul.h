@@ -43,7 +43,6 @@ void atomic_set_mask(unsigned int mask, atomic_t *v);
 
 typedef unsigned long kernel_ulong_t;
 typedef unsigned int  u_int;
-typedef long          ptrdiff_t;
 typedef unsigned __bitwise slab_flags_t;
 
 #define DECLARE_BITMAP(name,bits) \
@@ -56,19 +55,6 @@ typedef unsigned __bitwise slab_flags_t;
 
 #define smp_load_acquire(p)     *(p)
 
-
-/************************
- ** uapi/linux/types.h **
- ************************/
-
-typedef __u16 __le16;
-typedef __u16 __be16;
-typedef __u32 __le32;
-typedef __u32 __be32;
-typedef __u64 __le64;
-typedef __u64 __be64;
-
-typedef unsigned __poll_t;
 
 /********************
  ** linux/printk.h **
@@ -132,6 +118,7 @@ struct page
 	atomic_t   _count;
 	void      *addr;
 	dma_addr_t paddr;
+	unsigned   flags;
 } __attribute((packed));
 
 /* needed for agp/generic.c */
@@ -140,13 +127,6 @@ struct page *virt_to_page(const void *addr);
 dma_addr_t page_to_phys(struct page *page);
 
 #include <lx_emul/bitops.h>
-
-extern unsigned long find_next_bit(const unsigned long *addr, unsigned long
-                                   size, unsigned long offset);
-extern unsigned long find_next_zero_bit(const unsigned long *addr, unsigned
-                                        long size, unsigned long offset);
-#define find_first_bit(addr, size) find_next_bit((addr), (size), 0)
-#define find_first_zero_bit(addr, size) find_next_zero_bit((addr), (size), 0)
 
 #define __const_hweight8(w)             \
 	( (!!((w) & (1ULL << 0))) +       \
@@ -169,10 +149,6 @@ extern unsigned long find_next_zero_bit(const unsigned long *addr, unsigned
 
 
 #include <lx_emul/errno.h>
-
-/* needed by 'virt_to_phys', which is needed by agp/generic.c */
-typedef unsigned long phys_addr_t;
-
 #include <lx_emul/string.h>
 
 void *memchr_inv(const void *s, int c, size_t n);
@@ -398,11 +374,6 @@ LX_MUTEX_INIT_DECLARE(core_lock);
 #define core_lock   LX_MUTEX(core_lock)
 
 
-static inline int mutex_lock_interruptible(struct mutex *lock) {
-	mutex_lock(lock);
-	return 0;
-}
-
 void mutex_lock_nest_lock(struct mutex *, struct mutex *);
 
 void might_lock(struct mutex *);
@@ -455,8 +426,6 @@ s64 timespec_to_ns(const struct timespec *ts);
  ** linux/timer.h **
  *******************/
 
-typedef int clockid_t;
-
 #include <lx_emul/timer.h>
 
 #define del_singleshot_timer_sync(t) del_timer_sync(t)
@@ -497,11 +466,6 @@ enum {
 
 #define delayed_work_pending(w) \
          work_pending(&(w)->work)
-
-#ifndef CONFIG_DEBUG_OBJECTS_WORK
-#define INIT_WORK_ONSTACK(_work, _func) while(0) { }
-static inline void destroy_work_on_stack(struct work_struct *work) { }
-#endif
 
 void INIT_DELAYED_WORK_ONSTACK(void *, void *);
 void destroy_delayed_work_on_stack(struct delayed_work *);

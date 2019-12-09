@@ -1,0 +1,33 @@
+LICENSE     := GPLv2
+VERSION     := 2
+
+DOWNLOADS   :=  virtio_gpu.archive
+
+#
+# Tools
+#
+$(call check_tool,flex)
+$(call check_tool,bison)
+
+FLEX = flex
+YACC = bison
+
+#
+# VirtIO GPU driver
+#
+SRC_DIR_VIRTIO_GPU  := src/drivers/framebuffer/virtio_gpu
+VERSION_VIRTIO_GPU  := 5.5.2
+URL(virtio_gpu)     := https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.5.2.tar.xz
+SHA(virtio_gpu)     := 24f5f383b0337374f160723bcf3bf679c75cb5bd3fd0824a56998e47c04ef99e
+DIR(virtio_gpu)     := $(SRC_DIR_VIRTIO_GPU)
+TAR_OPT(virtio_gpu) := --strip-components=1 --files-from - < <(sed 's/-x.x.x/-$(VERSION_VIRTIO_GPU)/g' $(REP_DIR)/virtio_gpu.list)
+HASH_INPUT          += $(REP_DIR)/virtio_gpu.list
+
+#
+# Patches
+#
+PATCHES := $(addprefix patches/,$(notdir $(wildcard $(REP_DIR)/patches/virtio_gpu*.patch)))
+
+
+PATCH_OPT(patches/virtio_gpu_drm.patch)    := -p1 -d$(SRC_DIR_VIRTIO_GPU)
+PATCH_OPT(patches/virtio_gpu_virtio.patch) := -p1 -d$(SRC_DIR_VIRTIO_GPU)

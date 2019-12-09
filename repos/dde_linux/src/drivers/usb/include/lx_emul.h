@@ -109,21 +109,10 @@ int atomic_inc_return(atomic_t *v);
 
 #include <lx_emul/types.h>
 
-typedef __u16 __le16;
-typedef __u32 __le32;
-typedef __u64 __le64;
-typedef __u64 __be64;
-
 typedef __u16 __sum16;
 typedef __u32 __wsum;
 
 typedef u64 sector_t;
-typedef int clockid_t;
-
-
-#ifndef __cplusplus
-typedef u16            wchar_t;
-#endif
 
 /*
  * Needed by 'dwc_common_port/usb.h'
@@ -139,8 +128,6 @@ typedef uint32_t      u_int32_t;
  * Needed by 'dwc_otg/dwc_otg/dwc_otg_fiq_fsm.h'
  */
 typedef unsigned short ushort;
-
-typedef unsigned long phys_addr_t;
 
 #define DIV_ROUND_UP(n,d) (((n) + (d) - 1) / (d))
 #define BITS_TO_LONGS(nr)       DIV_ROUND_UP(nr, 8 * sizeof(long))
@@ -578,8 +565,6 @@ LX_MUTEX_INIT_DECLARE(wacom_udev_list_lock);
 #define usb_port_peer_mutex  LX_MUTEX(usb_port_peer_mutex)
 #define usbfs_mutex          LX_MUTEX(usbfs_mutex)
 #define wacom_udev_list_lock LX_MUTEX(wacom_udev_list_lock)
-
-int  mutex_lock_interruptible(struct mutex *m);
 
 
 /***********************

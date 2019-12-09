@@ -29,9 +29,6 @@ enum { HZ = 100UL };
 #include <lx_emul/jiffies.h>
 #include <lx_emul/time.h>
 #include <lx_emul/bitops.h>
-
-typedef int clockid_t;
-
 #include <lx_emul/timer.h>
 #include <lx_emul/spinlock.h>
 
@@ -44,12 +41,6 @@ LX_MUTEX_INIT_DECLARE(wacom_udev_list_lock);
 #define dquirks_lock         LX_MUTEX(dquirks_lock)
 #define input_mutex          LX_MUTEX(input_mutex)
 #define wacom_udev_list_lock LX_MUTEX(wacom_udev_list_lock)
-
-
-typedef __u16 __le16;
-typedef __u32 __le32;
-typedef __u64 __le64;
-typedef __u64 __be64;
 
 #include <lx_emul/byteorder.h>
 #include <lx_emul/atomic.h>
@@ -337,8 +328,6 @@ struct driver_attribute {
 
 void msleep(unsigned int);
 
-long find_next_zero_bit_le(const void *addr, unsigned long size, unsigned long offset);
-
 int  sysfs_create_group(struct kobject *kobj, const struct attribute_group *grp);
 
 int  down_interruptible(struct semaphore *sem);
@@ -450,8 +439,6 @@ int nonseekable_open(struct inode *inode, struct file *filp);
 
 enum { O_NONBLOCK = 0x4000 };
 
-typedef unsigned __poll_t;
-
 typedef struct poll_table_struct { } poll_table;
 
 size_t copy_to_user(void *dst, void const *src, size_t len);
@@ -485,8 +472,6 @@ unsigned long clear_user(void *to, unsigned long n);
 signed long schedule_timeout(signed long timeout);
 
 int kstrtouint(const char *s, unsigned int base, unsigned int *res);
-
-#define find_next_zero_bit find_next_zero_bit_le
 
 int  device_set_wakeup_enable(struct device *dev, bool enable);
 
@@ -533,9 +518,6 @@ void * devres_open_group(struct device *dev, void *id, gfp_t gfp);
 void devres_close_group(struct device *dev, void *id);
 
 static inline void add_input_randomness(unsigned int type, unsigned int code, unsigned int value) { }
-
-unsigned long find_next_bit(const unsigned long *addr, unsigned long size, unsigned long offset);
-#define find_first_bit(addr, size) find_next_bit((addr), (size), 0)
 
 char *devm_kasprintf(struct device *dev, gfp_t gfp, const char *fmt, ...);
 

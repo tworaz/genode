@@ -84,13 +84,6 @@ enum { HZ = 100UL };
 
 #include <lx_emul/types.h>
 
-typedef __u16 __le16;
-typedef __u32 __le32;
-typedef __u64 __le64;
-typedef __u64 __be64;
-
-typedef int clockid_t;
-
 typedef unsigned int  u_int;
 typedef unsigned char u_char;
 typedef unsigned long u_long;
@@ -100,9 +93,6 @@ typedef uint32_t      u_int32_t;
 
 typedef unsigned short ushort;
 
-typedef unsigned long phys_addr_t;
-
-typedef unsigned __poll_t;
 typedef unsigned slab_flags_t;
 
 
