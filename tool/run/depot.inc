@@ -458,6 +458,9 @@ proc check_for_missing_depot_archives { } {
 
 
 proc drivers_interactive_pkg { } {
+	if {[have_spec virtio] && ![have_spec pci]} {
+		return drivers_interactive-virtio-mmio
+	}
 
 	if {[have_spec muen]}      { return drivers_interactive-muen }
 	if {[have_spec linux]}     { return drivers_interactive-linux }

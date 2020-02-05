@@ -1,0 +1,7 @@
+base
+os
+fdt
+virtio_session
+timer_session
+report_session
+framebuffer_session
