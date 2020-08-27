@@ -66,7 +66,7 @@ endif
 
 %.o: %.s
 	$(MSG_ASSEM)$@
-	$(VERBOSE)$(CC) $(CC_DEF) $(CC_C_OPT) $(INCLUDES) -c $< -o $@
+	$(VERBOSE)$(CC) $(CC_MARCH) $(CC_AS_OPT) -c $< -o $@
 
 #
 # Compiling Ada source codes

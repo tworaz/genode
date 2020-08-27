@@ -31,7 +31,8 @@ INC_DIR += $(BASE_DIR)/src/core/include # for boot_modules.h only
 
 # configure multiprocessor mode
 NR_OF_CPUS ?= 1
-CC_OPT += -Wa,--defsym -Wa,NR_OF_CPUS=$(NR_OF_CPUS) -DNR_OF_CPUS=$(NR_OF_CPUS)
+CC_AS_OPT += -Wa,--defsym,NR_OF_CPUS=$(NR_OF_CPUS)
+CC_OPT += -DNR_OF_CPUS=$(NR_OF_CPUS)
 
 vpath base/%        $(BASE_HW_DIR)/src
 vpath bootstrap/%   $(BASE_HW_DIR)/src

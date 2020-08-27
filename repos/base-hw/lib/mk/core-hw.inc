@@ -73,7 +73,8 @@ include $(BASE_DIR)/src/core/version.inc
 
 # configure multiprocessor mode
 NR_OF_CPUS ?= 1
-CC_OPT += -Wa,--defsym -Wa,NR_OF_CPUS=$(NR_OF_CPUS) -DNR_OF_CPUS=$(NR_OF_CPUS)
+CC_AS_OPT += -Wa,--defsym,NR_OF_CPUS=$(NR_OF_CPUS)
+CC_OPT += -DNR_OF_CPUS=$(NR_OF_CPUS)
 
 # declare source locations
 vpath % $(BASE_HW_DIR)/src/core
