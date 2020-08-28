@@ -508,9 +508,14 @@ proc get_cmd_arg_first { arg_name default_value } {
 set run_name         [get_cmd_arg --name       "noname"]
 set genode_dir       [get_cmd_arg --genode-dir       ""]
 set cross_dev_prefix [get_cmd_arg --cross-dev-prefix ""]
+set cross_cxx        [get_cmd_arg --cross-cxx        ""]
+set cross_cc         [get_cmd_arg --cross-cc         ""]
 set specs            [get_cmd_arg --specs            ""]
 set board_var        [get_cmd_arg --board            ""]
 set repositories     [get_cmd_arg --repositories     ""]
+set use_clang        [get_cmd_arg --use-clang        ""]
+set llvm_tc_dir      [get_cmd_arg --llvm-tc-dir      ""]
+set gcc_tc_dir       [get_cmd_arg --gcc-tc-dir       ""]
 
 
 # accessor functions for command-line arguments
@@ -518,6 +523,11 @@ proc run_name         { } { global run_name;         return $run_name }
 proc run_dir          { } { global run_name;         return var/run/$run_name }
 proc genode_dir       { } { global genode_dir;       return $genode_dir }
 proc cross_dev_prefix { } { global cross_dev_prefix; return $cross_dev_prefix }
+proc cross_cxx        { } { global cross_cxx;        return [split $cross_cxx " "] }
+proc cross_cc         { } { global cross_cc;         return [split $cross_cc " " ] }
+proc use_clang        { } { global use_clang;        return $use_clang }
+proc llvm_tc_dir      { } { global llvm_tc_dir;      return $llvm_tc_dir }
+proc gcc_tc_dir       { } { global gcc_tc_dir;       return $gcc_tc_dir }
 
 ##
 # Return true if spec value is set for the build
@@ -933,18 +943,18 @@ proc build_core {lib modules target link_address} {
 	if {[have_spec "x86_32"]} { set arch -m32 }
 
 	# determine the libgcc
-	set libgcc [exec [cross_dev_prefix]gcc -print-libgcc-file-name {*}$arch]
+	set libgcc [exec {*}[cross_cc] -print-libgcc-file-name {*}$arch]
 
 	# compile the boot modules into one object file
-	exec [cross_dev_prefix]gcc {*}$arch -c -x assembler -o [run_dir].boot_modules.o - << $asm_src
+	exec {*}[cross_cc] {*}$arch -c -x assembler -o [run_dir].boot_modules.o - << $asm_src
 
 	# link final image
-	exec [cross_dev_prefix]g++ {*}$arch -nostdlib {*}[core_ld_opts] \
-	                           -Wl,-z -Wl,max-page-size=0x1000 \
-	                           -Wl,-Ttext=$link_address -Wl,-gc-sections \
-	                           -Wl,-nostdlib -Wl,--whole-archive -Wl,--start-group \
-	                           $lib [run_dir].boot_modules.o -Wl,--no-whole-archive \
-	                           -Wl,--end-group $libgcc -o $target
+	exec {*}[cross_cxx] {*}$arch -nostdlib {*}[core_ld_opts] \
+	                    -Wl,-z -Wl,max-page-size=0x1000 \
+	                    -Wl,-Ttext=$link_address -Wl,-gc-sections \
+	                    -Wl,-nostdlib -Wl,--whole-archive -Wl,--start-group \
+	                    $lib [run_dir].boot_modules.o -Wl,--no-whole-archive \
+	                    -Wl,--end-group $libgcc -o $target
 }
 
 

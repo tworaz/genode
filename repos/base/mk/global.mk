@@ -9,24 +9,57 @@
 -include $(BUILD_BASE_DIR)/etc/tools.conf
 
 #
+# Use clang based toolchain to build the code.
+#
+USE_CLANG ?= no
+
+#
 # Set undefined CUSTOM_ tools to their default values
 #
+ifeq ($(USE_CLANG),yes)
+CUSTOM_CC       ?= $(GENODE_LLVM_TOOLCHAIN_DIR)/bin/clang
+CUSTOM_CXX      ?= $(GENODE_LLVM_TOOLCHAIN_DIR)/bin/clang++
+CUSTOM_CPP      ?= $(CUSTOM_CC) -E
+CUSTOM_CXX_LIB  ?= $(CROSS_DEV_PREFIX)g++
+CUSTOM_HOST_CC  ?= $(CUSTOM_CC)
+CUSTOM_HOST_CXX ?= $(CUSTOM_CXX)
+CUSTOM_AR       ?= $(GENODE_LLVM_TOOLCHAIN_DIR)/bin/llvm-ar
+CUSTOM_NM       ?= $(GENODE_LLVM_TOOLCHAIN_DIR)/bin/llvm-nm
+CUSTOM_OBJCOPY  ?= $(GENODE_LLVM_TOOLCHAIN_DIR)/bin/llvm-objcopy
+CUSTOM_RANLIB   ?= $(GENODE_LLVM_TOOLCHAIN_DIR)/bin/llvm-ranlib
+CUSTOM_STRIP    ?= $(GENODE_LLVM_TOOLCHAIN_DIR)/bin/llvm-strip
+else
 CUSTOM_CC       ?= $(CROSS_DEV_PREFIX)gcc
 CUSTOM_CXX      ?= $(CROSS_DEV_PREFIX)g++
 CUSTOM_CPP      ?= $(CROSS_DEV_PREFIX)cpp
 CUSTOM_CXX_LIB  ?= $(CUSTOM_CXX)
-CUSTOM_LD       ?= $(CROSS_DEV_PREFIX)ld
-CUSTOM_AS       ?= $(CROSS_DEV_PREFIX)as
+CUSTOM_HOST_CC  ?= $(HOST_DEV_PREFIX)gcc
+CUSTOM_HOST_CXX ?= $(HOST_DEV_PREFIX)g++
 CUSTOM_AR       ?= $(CROSS_DEV_PREFIX)ar
 CUSTOM_NM       ?= $(CROSS_DEV_PREFIX)nm
 CUSTOM_OBJCOPY  ?= $(CROSS_DEV_PREFIX)objcopy
 CUSTOM_RANLIB   ?= $(CROSS_DEV_PREFIX)ranlib
 CUSTOM_STRIP    ?= $(CROSS_DEV_PREFIX)strip
+endif
+
+CUSTOM_LD       ?= $(CROSS_DEV_PREFIX)ld
+CUSTOM_AS       ?= $(CROSS_DEV_PREFIX)as
 CUSTOM_GNATBIND ?= $(CROSS_DEV_PREFIX)gnatbind
-CUSTOM_HOST_CC  ?= $(HOST_DEV_PREFIX)gcc
-CUSTOM_HOST_CXX ?= $(HOST_DEV_PREFIX)g++
 CUSTOM_ADA_CC   ?= $(CUSTOM_CC)
 CUSTOM_ALI2DEP  ?= $(CROSS_DEV_PREFIX)ali2dep
+
+ifeq ($(USE_CLANG),yes)
+# Clang is a multi-target compiler when one binary can cross-compile
+# code for mutliple targets. To do this however we need to tell it
+# which target platform its supposed to generate code for.
+CLANG_FLAGS := --target=$(CLANG_TARGET)
+# Genode clang support still relies on GCC to provide libgcc and C++
+# runtime. As such we need to instruct clang where to look for
+# appropriate, genode specific gcc toolchain.
+CLANG_FLAGS += --gcc-toolchain=$(GENODE_GCC_TOOLCHAIN_DIR)
+CUSTOM_CC += ${CLANG_FLAGS}
+CUSTOM_CXX += ${CLANG_FLAGS}
+endif
 
 #
 # GNU utilities
@@ -134,6 +167,21 @@ endif
 #
 CC_OLEVEL ?= -O2
 CC_WARN   ?= -Wall
+
+ifeq ($(USE_CLANG),yes)
+CC_OPT += -fno-builtin-memset
+CC_WARN += -Wno-mismatched-tags
+CC_WARN += -Wno-undefined-bool-conversion
+CC_WARN += -Wno-uninitialized
+CC_WARN += -Wno-deprecated-copy
+CC_WARN += -Wno-asm-operand-widths
+CC_WARN += -Wno-null-dereference
+CC_WARN += -Wno-overloaded-virtual
+# Don't warn about unrecognized, GCC specific pragmas.
+CC_WARN += -Wno-unknown-pragmas
+# Triggered by code in x86_64 base-hw, would be nice to have on arm.
+CC_WARN += -Wno-address-of-packed-member
+endif
 
 #
 # XXX fix the warnings and remove this option

@@ -137,11 +137,13 @@ endif
 #
 # Empty DST_DIRS is interpreted as a tool-chain agnostic target, e.g., clean.
 #
+ifneq ($(USE_CLANG),yes)
 ifneq ($(DST_DIRS),)
 REQUIRED_GCC_VERSION ?= 8.3.0
 GCC_VERSION := $(filter $(REQUIRED_GCC_VERSION) ,$(shell $(CUSTOM_CXX) --version))
 ifneq ($(GCC_VERSION), $(REQUIRED_GCC_VERSION))
 $(error "$(CUSTOM_CXX) version $(REQUIRED_GCC_VERSION) is required")
+endif
 endif
 endif
 
@@ -336,6 +338,11 @@ run/%: $(call select_from_repositories,run/%.run) $(RUN_ENV)
 	                                     --board "$(BOARD)" \
 	                                     --repositories "$(REPOSITORIES)" \
 	                                     --cross-dev-prefix "$(CROSS_DEV_PREFIX)" \
+	                                     --cross-cc "$(CUSTOM_CC)" \
+	                                     --cross-cxx "$(CUSTOM_CXX)" \
+	                                     --llvm-tc-dir "$(GENODE_LLVM_TOOLCHAIN_DIR)" \
+	                                     --gcc-tc-dir "$(GENODE_GCC_TOOLCHAIN_DIR)" \
+	                                     --use-clang "$(USE_CLANG)" \
 	                                     --qemu-args "$(QEMU_OPT)" \
 	                                     --make "$(MAKE)" \
 	                                     $(RUN_OPT) \

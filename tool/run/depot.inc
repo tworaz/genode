@@ -208,6 +208,9 @@ proc _depot_auto_update { archives } {
 	set    cmd "[genode_dir]/tool/depot/create $archives_to_create "
 	append cmd "CROSS_DEV_PREFIX=[cross_dev_prefix] "
 	append cmd "DEPOT_DIR=[depot_dir] "
+	append cmd "USE_CLANG=[use_clang] "
+	append cmd "GENODE_GCC_TOOLCHAIN_DIR=[gcc_tc_dir] "
+	append cmd "GENODE_LLVM_TOOLCHAIN_DIR=[llvm_tc_dir] "
 	append cmd "UPDATE_VERSIONS=1 FORCE=1 REBUILD= "
 
 	set make_j_arg ""
