@@ -25,18 +25,6 @@ EH_SYMBOLS = _Unwind_Resume _Unwind_Complete _Unwind_DeleteException
 #
 EH_SYMBOLS += __aeabi_unwind_cpp_pr0 __aeabi_unwind_cpp_pr1
 
-#
-# Take the right system libraries
-#
-# Normally, we never include build-system-internal files from library-
-# description files. For building the 'cxx' library, however, we need the
-# information about the used 'gcc' for resolving the location of the C++
-# support libraries. This definition is performed by 'mk/lib.mk' after
-# including this library description file. Hence, we need to manually
-# include 'global.mk' here.
-#
-include $(BASE_DIR)/mk/global.mk
-
 LIBCXX_GCC = $(shell $(CUSTOM_CXX_LIB) $(CC_MARCH) -print-file-name=libsupc++.a) \
              $(shell $(CUSTOM_CXX_LIB) $(CC_MARCH) -print-file-name=libgcc_eh.a || true)
 
