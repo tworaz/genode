@@ -78,7 +78,11 @@ struct Genode::Trace::Logger
 		 * Log event to trace buffer
 		 */
 		template <typename EVENT>
+#ifdef __clang__
+		[[clang::optnone]]
+#else
 		__attribute__((optimize("-fno-delete-null-pointer-checks")))
+#endif
 		void log(EVENT const *event)
 		{
 			if (!this || !_evaluate_control()) return;

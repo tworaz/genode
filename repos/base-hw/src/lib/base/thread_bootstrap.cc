@@ -63,7 +63,11 @@ void prepare_reinit_main_thread() { prepare_init_main_thread(); }
  ************/
 
 /* prevent the compiler from optimizing out the 'this' pointer check */
+#ifdef __clang__
+[[clang::optnone]]
+#else
 __attribute__((optimize("-fno-delete-null-pointer-checks")))
+#endif
 Native_utcb *Thread::utcb()
 {
 	if (this) { return &_stack->utcb(); }

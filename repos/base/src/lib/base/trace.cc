@@ -147,7 +147,11 @@ bool Trace::Logger::_evaluate_control()
 }
 
 
+#ifdef __clang__
+[[clang::optnone]]
+#else
 __attribute__((optimize("-fno-delete-null-pointer-checks")))
+#endif
 void Trace::Logger::log(char const *msg, size_t len)
 {
 	if (!this || !_evaluate_control()) return;
@@ -157,7 +161,11 @@ void Trace::Logger::log(char const *msg, size_t len)
 }
 
 
+#ifdef __clang__
+[[clang::optnone]]
+#else
 __attribute__((optimize("-fno-delete-null-pointer-checks")))
+#endif
 bool Trace::Logger::log_captured(char const *msg, size_t len)
 {
 	if (!this || !_evaluate_control()) return false;
