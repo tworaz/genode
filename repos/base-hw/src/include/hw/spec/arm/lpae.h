@@ -112,7 +112,7 @@ namespace Hw {
 
 
 template <unsigned BLOCK_SIZE_LOG2, unsigned SZ_LOG2>
-class Hw::Long_translation_table
+class alignas(1 << Hw::SIZE_LOG2_4KB) Hw::Long_translation_table
 {
 	private:
 
@@ -321,7 +321,7 @@ class Hw::Long_translation_table
 					return false;
 			return true;
 		}
-} __attribute__((aligned(1 << ALIGNM_LOG2)));
+};
 
 
 template <Hw::Stage STAGE>
