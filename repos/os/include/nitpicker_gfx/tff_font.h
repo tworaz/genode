@@ -227,7 +227,7 @@ class Tff_font : public Text_painter::Font
 
 		unsigned baseline() const override
 		{
-			Tff::Vertical_metrics const m = _vertical_metrics['m'];
+			Tff::Vertical_metrics const m = _vertical_metrics[(int)'m'];
 			return m.vpos + m.height;
 		}
 
